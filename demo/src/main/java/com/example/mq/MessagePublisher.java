@@ -14,14 +14,23 @@ import java.util.UUID;
 @RequestMapping("/api/messages")
 public class MessagePublisher {
 
+    private final RabbitTemplate template;
+
     @Autowired
-    private RabbitTemplate template;
+    public MessagePublisher(RabbitTemplate template) {
+        this.template = template;
+    }
 
     @PostMapping("/publish")
     public String publishMessage(@RequestBody CustomMessage message) {
-        message.setMessageid(UUID.randomUUID().toString());
-        message.setMessgaeDate(new Date());
-        template.convertAndSend(MQConfig.EXCHANGE, MQConfig.ROUTING_KEY, message);
+        message.setMessageId(UUID.randomUUID().toString());
+        message.setMessageDate(new Date());
+
+        template.convertAndSend(
+                MQConfig.EXCHANGE,
+                MQConfig.ROUTING_KEY,
+                message
+        );
 
         return "messagePublished";
     }
